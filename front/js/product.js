@@ -1,5 +1,6 @@
 const baseUrl = "http://localhost:3000/api/products/:id";
 let globalProduct = null;
+
 function getProduct() {
 
     const id = getIdfromUrl();
@@ -55,6 +56,7 @@ function addToCart() {
         cart[globalProduct._id][color] = quantity;
        
         window.localStorage.setItem('cart', JSON.stringify(cart));
+        alert('produit ajouter avec succés');
     }
 }
 
