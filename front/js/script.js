@@ -1,4 +1,6 @@
 const baseUrl = "http://localhost:3000/api/products";
+
+// va etre utiliser comme un model pour afficher le produit
 const baseProduct = `<a href="./product.html?id=:id">
             <article>
               <img src=":image" alt=":alt">
@@ -7,6 +9,7 @@ const baseProduct = `<a href="./product.html?id=:id">
             </article>
           </a>`;
 
+// recuperer la liste des produits depuis le bakend          
 function getProductList() {
     const request = new XMLHttpRequest();
 
@@ -19,14 +22,17 @@ function getProductList() {
     request.send(null);
 }
 
+//afficher la liste de produits dans html
 function showProductList(productsList) {
     productsList.forEach(product => {
         renderProduct(product);
     });
 
 }
+
+//afficher un seul produit dans html 
 function renderProduct(product) {
-    let productHtml = baseProduct
+    const productHtml = baseProduct
         .replace(':id', product._id)
         .replace(':image', product.imageUrl)
         .replace(':alt', product.altTxt)
@@ -35,4 +41,7 @@ function renderProduct(product) {
     document.getElementById('items').innerHTML += productHtml;
 }
 
+//-----------------------debut script -----------------------------
+
+// afficher la liste des produits au demarrage de la page
 getProductList();
