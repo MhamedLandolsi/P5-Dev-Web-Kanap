@@ -75,7 +75,7 @@ function addToCart() {
         }
         window.localStorage.setItem('cart', JSON.stringify(cart));
         
-        if (quantity === 1) {
+        if (quantity == 1) {
             alert('Le produit a été ajouter dans le panier');
         } else {
             alert('Les produits ont été ajouter dans le panier');
