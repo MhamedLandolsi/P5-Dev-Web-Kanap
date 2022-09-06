@@ -9,7 +9,7 @@ const baseProduct = `<a href="./product.html?id=:id">
             </article>
           </a>`;
 
-// recuperer la liste des produits depuis le bakend          
+// recuperer la liste des produits depuis le backend          
 function getProductList() {
     const request = new XMLHttpRequest();
 
@@ -22,7 +22,7 @@ function getProductList() {
     request.send(null);
 }
 
-//afficher la liste de produits dans html
+//afficher la liste des produits dans html
 function showProductList(productsList) {
     productsList.forEach(product => {
         renderProduct(product);

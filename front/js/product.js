@@ -4,7 +4,8 @@ let globalProduct = null;
 //recuperer le produit du back-end
 function getProduct() {
 
-    const id = getIdfromUrl();
+    const id = getIdFromUrl();
+
     if (id === null) {
         alert("l'id du product est vide !!!!");
 
@@ -22,7 +23,7 @@ function getProduct() {
 }
 
 // recuperer l'id du produit de l'url
-function getIdfromUrl() {
+function getIdFromUrl() {
     const urlParams = new URLSearchParams(window.location.search);
 
     return urlParams.get('id');
@@ -39,7 +40,7 @@ function showProductDetails(product) {
     fillColor(product.colors);
 }
 
-// remplire la liste de couleur 
+// remplire la liste des couleurs 
 function fillColor(colors) {
     colors.forEach(color => {
         document.getElementById('colors').innerHTML += `<option value="${color}">${color}</option>`;
@@ -53,29 +54,49 @@ function addToCart() {
 
     if (checkinput(quantity, color)) {
         let cart = JSON.parse(window.localStorage.getItem('cart'));
-        if (cart === null) {
+        
+        if (!cart) {
             cart = {};
         }
         if (!cart[globalProduct._id]) {
             cart[globalProduct._id] = {};
         }
-        cart[globalProduct._id][color] = quantity;
+        
+        
+        let newQauntity = cart[globalProduct._id][color] ? cart[globalProduct._id][color] : 0;
+        newQauntity += parseInt(quantity);
 
+        if (newQauntity > 100) {
+            alert('La quantité total ne peut pas dépasser 100 !');
+
+            return;
+        } else {
+            cart[globalProduct._id][color] = newQauntity;
+        }
         window.localStorage.setItem('cart', JSON.stringify(cart));
-        alert('produit ajouter avec succés');
+        
+        if (quantity === 1) {
+            alert('Le produit a été ajouter dans le panier');
+        } else {
+            alert('Les produits ont été ajouter dans le panier');
+        }
     }
 }
 
 // verifier les entreés de l'utilisateur 
 function checkinput(quantity, color) {
-    if (quantity < 1 || quantity > 100) {
-        alert("quantite invalide");
+    if (quantity < 1) {
+        alert("La quantité doit être supérieur à 0 !");
+
+        return false;
+    } else if (quantity > 100) {
+        alert('La quantité ne peut pas dépasser 100 !');
 
         return false;
     }
 
     if (color === '') {
-        alert("color invalide");
+        alert("Vous devez choisir un couleur !");
 
         return false;
     }

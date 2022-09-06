@@ -25,6 +25,7 @@ const itemModel = `<article class="cart__item" data-id=":id" data-color=":color:
                   </div>
                 </div>
               </article>`
+
 // afficher les produits du pannier dans html
 function showUpdateCart() {
     cleanItemsView();
@@ -37,6 +38,7 @@ function showUpdateCart() {
         showUpdatePriceAndQuantity(0, 0);
         return;
     }
+    
     for (const productId in cart) {
         for (const productColor in cart[productId]) {
             const remoteProduct = getRemoteProduct(productId);
@@ -51,7 +53,7 @@ function showUpdateCart() {
         }
     }
 
-    showUpdateAndQuantity(totalPrice, totalQuatity);
+    showUpdatePriceAndQuantity(totalPrice, totalQuatity);
     bindDeleteEditItem();
 }
 
@@ -61,7 +63,7 @@ function cleanItemsView() {
 }
 
 //afficher le prix total et la quantity total
-function showUpdateAndQuantity(price, quantity) {
+function showUpdatePriceAndQuantity(price, quantity) {
     document.getElementById('totalQuantity').innerHTML = quantity;
     document.getElementById('totalPrice').innerHTML = price;
 }
@@ -95,6 +97,7 @@ function getRemoteProduct(productId) {
 // ajouter les actions pour effacer ou modifier un article
 function bindDeleteEditItem() {
     const allDeleteButton = document.getElementsByClassName('deleteItem');
+    
     for (let i = 0; i < allDeleteButton.length; i++) {
         const element = allDeleteButton[i];
         const articleElement = element.parentNode.parentNode.parentNode.parentNode;
@@ -104,6 +107,7 @@ function bindDeleteEditItem() {
     }
 
     const allinputs = document.getElementsByName('itemQuantity');
+    
     for (let i = 0; i < allinputs.length; i++) {
         const element = allinputs[i];
         const articleElement = element.parentNode.parentNode.parentNode.parentNode;
@@ -126,12 +130,15 @@ function removeItem(id, color) {
 
 // edit element dans le panier
 function editItem(id, color, value) {
-    if (value <= 0 || value > 100) {
-        alert('valeur incorrecte');
+    if (value <= 0) {
+        alert('La quantité doit être supérieur à 0 !');
+        return;
+    }else if(value > 100){
+        alert('La quantité ne peut pas dépasser 100 !');
         return;
     }
 
-    cart[id][color] = value;
+    cart[id][color] = parseInt(value);
     window.localStorage.setItem('cart', JSON.stringify(cart));
     showUpdateCart();
 }
@@ -147,41 +154,48 @@ function submitForm() {
     let error = false;
 
     if (firstName.length < 2 || firstName.length > 30 || !/^[a-zA-Z ]+$/.test(firstName)) {
-        document.getElementById('firstNameErrorMsg').innerText = 'Prénom invalide';
+        document.getElementById('firstNameErrorMsg').innerText = 'Merci de fournir un Prénom valide';
         error = true;
+    }else{
+        document.getElementById('firstNameErrorMsg').innerText ='';
     }
 
     if (lastName.length < 2 || lastName.length > 30 || !/^[a-zA-Z ]+$/.test(lastName)) {
-        document.getElementById('lastNameErrorMsg').innerText = 'Nom invalide';
+        document.getElementById('lastNameErrorMsg').innerText = 'Merci de fournir un Nom valide';
         error = true;
+    }else{
+        document.getElementById('lastNameErrorMsg').innerText = '';
     }
 
     if (address.length < 10 || address.length > 50) {
-        document.getElementById('addressErrorMsg').innerText = 'Adresse invalide';
+        document.getElementById('addressErrorMsg').innerText = 'Merci de fournir une Adresse valide';
         error = true;
+    }else{
+        document.getElementById('addressErrorMsg').innerText = '';
     }
 
     if (city.length < 2 || city.length > 30 || !/^[a-zA-Z ]+$/.test(city)) {
-        document.getElementById('cityErrorMsg').innerText = 'Ville invalide';
+        document.getElementById('cityErrorMsg').innerText = 'Merci de fournir une Ville valide';
         error = true;
+    }else{
+        document.getElementById('cityErrorMsg').innerText ='';
     }
 
     if (!validateEmail(email)) {
-        document.getElementById('emailErrorMsg').innerText = 'Email invalide';
+        document.getElementById('emailErrorMsg').innerText = 'Merci de fournir un Email valide';
         error = true;
+    }else{
+        document.getElementById('emailErrorMsg').innerText ='';
     }
 
-    if (!error) {
+    if (!error && totalPrice > 0) {
         const orderId = confirmOrder(firstName, lastName, address, city, email);
-        if (orderId !== null) {
-            window.localStorage.removeItem('cart');
-            window.localStorage.setItem('orderId', orderId);
-            window.location.href = './confirmation.html';
-        }
+        cleanCartAndSetOrder(orderId);
     }
 
     return false;
 }
+
 
 // verifier que l'Email est correct 
 function validateEmail(email) {
@@ -223,8 +237,17 @@ function sendCommand(payload) {
     return null;
 }
 
+// vider panier, sauvegader orderId et redirection vers la page de confirmation 
+function cleanCartAndSetOrder(orderId){
+    if (orderId !== null) {
+        window.localStorage.removeItem('cart');
+        window.localStorage.setItem('orderId', orderId);
+        window.location.href = './confirmation.html';
+    }
+}
+
 //-----------------------debut script -----------------------------
 
 //afficher le pannier au demarrage
 showUpdateCart();
-document.getElementsByTagName('form')[0].onsubmit = submitForm;
+document.getElementsByTagName('form')[0].onsubmit = submitForm; 
