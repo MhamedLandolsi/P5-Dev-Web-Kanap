@@ -1,30 +1,6 @@
-const productUrl = "http://localhost:3000/api/products/:id";
-const orderUrl = "http://localhost:3000/api/products/order";
 let cart = {}
 let totalQuatity = 0;
 let totalPrice = 0;
-
-const itemModel = `<article class="cart__item" data-id=":id" data-color=":color:">
-                <div class="cart__item__img">
-                  <img src=":image" alt=":alt">
-                </div>
-                <div class="cart__item__content">
-                  <div class="cart__item__content__description">
-                    <h2>:name:</h2>
-                    <p>:color:</p>
-                    <p>:price: €</p>
-                  </div>
-                  <div class="cart__item__content__settings">
-                    <div class="cart__item__content__settings__quantity">
-                      <p>:quantity: : </p>
-                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value=":quantity:">
-                    </div>
-                    <div class="cart__item__content__settings__delete">
-                      <p class="deleteItem">Supprimer</p>
-                    </div>
-                  </div>
-                </div>
-              </article>`
 
 // afficher les produits du pannier dans html
 function showUpdateCart() {
@@ -40,13 +16,17 @@ function showUpdateCart() {
     }
     
     for (const productId in cart) {
-        for (const productColor in cart[productId]) {
-            const remoteProduct = getRemoteProduct(productId);
-            if (remoteProduct === null) {
-                cleanItemsView();
-                alert('Erreur: on ne peut pas contacter le backend.')
-            }
-            const quantity = parseInt(cart[productId][productColor]);
+        let remoteProduct = getRemoteProduct(productId);
+        
+        if (remoteProduct === null) {
+            cleanItemsView();
+            alert('Erreur: on ne peut pas contacter le serveur.')
+            return;
+        }
+
+        for (let productColor in cart[productId]) {
+            
+            let quantity = parseInt(cart[productId][productColor]);
             totalPrice += remoteProduct.price * quantity;
             totalQuatity += quantity;
             showProductItem(remoteProduct, productColor, quantity);
@@ -64,27 +44,77 @@ function cleanItemsView() {
 
 //afficher le prix total et la quantity total
 function showUpdatePriceAndQuantity(price, quantity) {
-    document.getElementById('totalQuantity').innerHTML = quantity;
-    document.getElementById('totalPrice').innerHTML = price;
+    document.getElementById('totalQuantity').innerText = quantity;
+    document.getElementById('totalPrice').innerText = price;
 }
 
 // afficher les articles dans html 
 function showProductItem(product, color, quantity) {
-    const productHtml = itemModel
-        .replaceAll(':id', product._id)
-        .replaceAll(':image', product.imageUrl)
-        .replaceAll(':alt', product.altTxt)
-        .replaceAll(':name:', product.name)
-        .replaceAll(':quantity:', quantity)
-        .replaceAll(':price:', product.price)
-        .replaceAll(':color:', color);
-    document.getElementById('cart__items').innerHTML += productHtml;
+    let article = document.createElement('article');
+    let div1 = document.createElement('div');
+    let img = document.createElement('img');
+    let div2 = document.createElement('div');
+    let div3 = document.createElement('div');
+    let h2 = document.createElement('h2');
+    let p1 = document.createElement('p');
+    let p2 = document.createElement('p');
+    let div4 = document.createElement('div');
+    let div5 = document.createElement('div');
+    let p3 = document.createElement('p');
+    let input = document.createElement('input');
+    let div6 = document.createElement('div');
+    let p4 = document.createElement('p');
+
+    p4.setAttribute('class', 'deleteItem');
+    p4.innerText = 'Supprimer';
+
+    div6.setAttribute('class', 'cart__item__content__settings__delete');
+    div6.append(p4);
+
+    p3.innerText = quantity;
+    input.setAttribute('type', 'number');
+    input.setAttribute('class', 'itemQuantity');
+    input.setAttribute('name', 'itemQuantity');
+    input.setAttribute('min', '1');
+    input.setAttribute('max', '100');
+    input.setAttribute('value', quantity);
+
+    div5.setAttribute('class', 'cart__item__content__settings__quantity');
+    div5.append(p3, input);
+
+    div4.setAttribute('class', 'cart__item__content__settings')
+
+    div4.append(div5, div6);
+
+    p2.innerText = product.price;
+    p1.innerText = color;
+    h2.innerText = product.name;
+    
+    div3.setAttribute('class', 'cart__item__content__description');
+    div3.append(h2, p1, p2);
+
+    div2.setAttribute('class', 'cart__item__content');
+    div2.append(div3, div4);
+    
+    img.setAttribute('src', product.imageUrl);
+    img.setAttribute('alt', product.altTxt); 
+
+    div1.setAttribute('class', 'cart__item__img');
+    div1.append(img);
+
+    article.setAttribute('class', 'cart__item');
+    article.setAttribute('data-id', product._id);
+    article.setAttribute('data-color', color);
+
+    article.append(div1, div2);
+
+    document.getElementById('cart__items').append(article);
 }
 
-// recuperer le product du backend
+// récuperer le product du backend
 function getRemoteProduct(productId) {
     const request = new XMLHttpRequest();
-    request.open('GET', productUrl.replace(':id', productId), false);
+    request.open('GET', 'http://localhost:3000/api/products/' + productId, false);
     request.send(null);
 
     if (request.status == 200) {
@@ -96,23 +126,23 @@ function getRemoteProduct(productId) {
 
 // ajouter les actions pour effacer ou modifier un article
 function bindDeleteEditItem() {
-    const allDeleteButton = document.getElementsByClassName('deleteItem');
+    let allDeleteButton = document.getElementsByClassName('deleteItem');
     
     for (let i = 0; i < allDeleteButton.length; i++) {
-        const element = allDeleteButton[i];
-        const articleElement = element.parentNode.parentNode.parentNode.parentNode;
-        const id = articleElement.getAttribute('data-id');
-        const color = articleElement.getAttribute('data-color');
+        let element = allDeleteButton[i];
+        let articleElement = element.parentNode.parentNode.parentNode.parentNode;
+        let id = articleElement.getAttribute('data-id');
+        let color = articleElement.getAttribute('data-color');
         element.onclick = () => removeItem(id, color);
     }
 
-    const allinputs = document.getElementsByName('itemQuantity');
+    let allinputs = document.getElementsByClassName('itemQuantity');
     
     for (let i = 0; i < allinputs.length; i++) {
-        const element = allinputs[i];
-        const articleElement = element.parentNode.parentNode.parentNode.parentNode;
-        const id = articleElement.getAttribute('data-id');
-        const color = articleElement.getAttribute('data-color');
+        let element = allinputs[i];
+        let articleElement = element.parentNode.parentNode.parentNode.parentNode;
+        let id = articleElement.getAttribute('data-id');
+        let color = articleElement.getAttribute('data-color');
         element.onchange = () => editItem(id, color, element.value);
     }
 }
@@ -132,9 +162,11 @@ function removeItem(id, color) {
 function editItem(id, color, value) {
     if (value <= 0) {
         alert('La quantité doit être supérieur à 0 !');
+        
         return;
     }else if(value > 100){
         alert('La quantité ne peut pas dépasser 100 !');
+        
         return;
     }
 
@@ -145,11 +177,11 @@ function editItem(id, color, value) {
 
 //verifier les donnees du formulaire et envoyer la commande au backend
 function submitForm() {
-    const firstName = document.getElementById('firstName').value;
-    const lastName = document.getElementById('lastName').value;
-    const address = document.getElementById('address').value;
-    const city = document.getElementById('city').value;
-    const email = document.getElementById('email').value;
+    let firstName = document.getElementById('firstName').value;
+    let lastName = document.getElementById('lastName').value;
+    let address = document.getElementById('address').value;
+    let city = document.getElementById('city').value;
+    let email = document.getElementById('email').value;
 
     let error = false;
 
@@ -189,8 +221,16 @@ function submitForm() {
     }
 
     if (!error && totalPrice > 0) {
-        const orderId = confirmOrder(firstName, lastName, address, city, email);
-        cleanCartAndSetOrder(orderId);
+        let contact = {
+            firstName,
+            lastName,
+            address,
+            city,
+            email
+        };
+        
+        window.localStorage.setItem('contact', JSON.stringify(contact));
+        window.location.href = './confirmation.html';
     }
 
     return false;
@@ -204,47 +244,7 @@ function validateEmail(email) {
     );
 }
 
-// confirmer l'ordre de commande et sauvgarder l'order Id
-function confirmOrder(firstName, lastName, address, city, email) {
 
-    const payload = {
-        contact: {
-            firstName,
-            lastName,
-            address,
-            city,
-            email
-        },
-        products: Object.keys(cart)
-    }
-    const order = sendCommand(payload);
-
-    return order ? order.orderId : null;
-}
-
-// envoyer la commande au backend 
-function sendCommand(payload) {
-    const request = new XMLHttpRequest();
-    request.open('POST', orderUrl, false);
-    request.setRequestHeader("Content-Type", "application/json");
-    request.send(JSON.stringify(payload));
-
-    if (request.status == 201) {
-        return JSON.parse(request.responseText);
-    }
-    alert('erreur serveur');
-
-    return null;
-}
-
-// vider panier, sauvegader orderId et redirection vers la page de confirmation 
-function cleanCartAndSetOrder(orderId){
-    if (orderId !== null) {
-        window.localStorage.removeItem('cart');
-        window.localStorage.setItem('orderId', orderId);
-        window.location.href = './confirmation.html';
-    }
-}
 
 //-----------------------debut script -----------------------------
 

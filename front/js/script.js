@@ -1,25 +1,13 @@
-const baseUrl = "http://localhost:3000/api/products";
-
-// va etre utiliser comme un model pour afficher le produit
-const baseProduct = `<a href="./product.html?id=:id">
-            <article>
-              <img src=":image" alt=":alt">
-              <h3 class="productName">:name</h3>
-              <p class="productDescription">:description</p>
-            </article>
-          </a>`;
-
 // recuperer la liste des produits depuis le backend          
 function getProductList() {
-    const request = new XMLHttpRequest();
+    let request = new XMLHttpRequest();
 
-    request.onload = function () {
-        const data = this.responseText;
-        showProductList(JSON.parse(data));
-    };
-
-    request.open('GET', baseUrl);
+    request.open('GET', 'http://localhost:3000/api/products', false);
     request.send(null);
+
+    if (request.status == 200) {
+        showProductList(JSON.parse(request.responseText));
+    }    
 }
 
 //afficher la liste des produits dans html
@@ -32,13 +20,23 @@ function showProductList(productsList) {
 
 //afficher un seul produit dans html 
 function renderProduct(product) {
-    const productHtml = baseProduct
-        .replace(':id', product._id)
-        .replace(':image', product.imageUrl)
-        .replace(':alt', product.altTxt)
-        .replace(':name', product.name)
-        .replace(':description', product.description);
-    document.getElementById('items').innerHTML += productHtml;
+
+    let a = document.createElement('a');
+    let article = document.createElement('article');
+    let img = document.createElement('img');
+    let h3 = document.createElement('h3');
+    let p = document.createElement('p');
+
+    a.setAttribute('href', './product.html?id=' + product._id);
+    img.setAttribute('src', product.imageUrl);
+    img.setAttribute('alt', product.altTxt);
+    h3.setAttribute('class', 'productName');
+    h3.innerText = product.name;
+    p.setAttribute('class', 'productDescription');
+    p.innerText = product.description;
+    article.append(img, h3, p);
+    a.append(article);
+    document.getElementById('items').append(a);
 }
 
 //-----------------------debut script -----------------------------
