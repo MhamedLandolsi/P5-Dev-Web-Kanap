@@ -38,8 +38,9 @@ function sendCommand(payload) {
 
 // vider panier, sauvegader orderId et redirection vers la page de confirmation 
 function cleanCartAndSetOrder(orderId){
-    if (orderId !== null) {
+     {
         window.localStorage.removeItem('cart');
+        window.localStorage.removeItem('contact');
         
     }
 }
@@ -47,6 +48,7 @@ function cleanCartAndSetOrder(orderId){
 // afficher l'order id
 function showOrderId() {  
     document.getElementById('orderId').innerText = confirmOrder();
+    cleanCartAndSetOrder();
 }
 
 //-----------------------debut script -----------------------------

@@ -109,7 +109,7 @@ function checkinput(quantity, color) {
     }
     
     if (quantity < 1) {
-        alert("La quantité doit être supérieur à 0 !");
+        alert("La quantité doit être supérieure à 0 !");
 
         return false;
     } else if (quantity > 100) {
