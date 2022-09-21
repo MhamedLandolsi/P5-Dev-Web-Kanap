@@ -219,6 +219,7 @@ function submitForm() {
     }else{
         document.getElementById('emailErrorMsg').innerText ='';
     }
+    if (totalPrice==0 ){alert(' Panier vide!!');
 
     if (!error && totalPrice > 0) {
         let contact = {
