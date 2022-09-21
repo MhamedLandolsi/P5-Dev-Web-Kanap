@@ -1,13 +1,8 @@
 // recuperer la liste des produits depuis le backend          
 function getProductList() {
-    let request = new XMLHttpRequest();
-
-    request.open('GET', 'http://localhost:3000/api/products', false);
-    request.send(null);
-
-    if (request.status == 200) {
-        showProductList(JSON.parse(request.responseText));
-    }    
+    fetch('http://localhost:3000/api/products')
+    .then(response => response.json())
+    .then(response => showProductList(response));
 }
 
 //afficher la liste des produits dans html

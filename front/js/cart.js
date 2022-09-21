@@ -185,14 +185,14 @@ function submitForm() {
 
     let error = false;
 
-    if (firstName.length < 2 || firstName.length > 30 || !/^[a-zA-Z ]+$/.test(firstName)) {
+    if (firstName.length < 3 || firstName.length > 30 || !/^[a-zA-Z ]+$/.test(firstName)) {
         document.getElementById('firstNameErrorMsg').innerText = 'Merci de fournir un Prénom valide';
         error = true;
     }else{
         document.getElementById('firstNameErrorMsg').innerText ='';
     }
 
-    if (lastName.length < 2 || lastName.length > 30 || !/^[a-zA-Z ]+$/.test(lastName)) {
+    if (lastName.length < 3 || lastName.length > 30 || !/^[a-zA-Z ]+$/.test(lastName)) {
         document.getElementById('lastNameErrorMsg').innerText = 'Merci de fournir un Nom valide';
         error = true;
     }else{
@@ -206,7 +206,7 @@ function submitForm() {
         document.getElementById('addressErrorMsg').innerText = '';
     }
 
-    if (city.length < 2 || city.length > 30 || !/^[a-zA-Z ]+$/.test(city)) {
+    if (city.length < 3 || city.length > 30 || !/^[a-zA-Z ]+$/.test(city)) {
         document.getElementById('cityErrorMsg').innerText = 'Merci de fournir une Ville valide';
         error = true;
     }else{
@@ -251,3 +251,4 @@ function validateEmail(email) {
 //afficher le pannier au demarrage
 showUpdateCart();
 document.getElementsByTagName('form')[0].onsubmit = submitForm; 
+

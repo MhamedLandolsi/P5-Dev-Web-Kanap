@@ -16,24 +16,21 @@ function confirmOrder() {
         contact,
         products: Object.keys(cart)
     }
-    let order = sendCommand(payload);
-
-    return order ? order.orderId : null;
+    sendCommand(payload);
 }
 
 // envoyer la commande au backend 
 function sendCommand(payload) {
-    const request = new XMLHttpRequest();
-    request.open('POST', 'http://localhost:3000/api/products/order', false);
-    request.setRequestHeader("Content-Type", "application/json");
-    request.send(JSON.stringify(payload));
-
-    if (request.status == 201) {
-        return JSON.parse(request.responseText);
-    }
-    alert('erreur serveur');
-
-    return null;
+    fetch('http://localhost:3000/api/products/order', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)   
+    })
+    .then(response => response.json())
+    .then(response => showOrderId(response.orderId));
 }
 
 // vider panier, sauvegader orderId et redirection vers la page de confirmation 
@@ -46,10 +43,10 @@ function cleanCartAndSetOrder(orderId){
 }
 
 // afficher l'order id
-function showOrderId() {  
-    document.getElementById('orderId').innerText = confirmOrder();
+function showOrderId(orderId) {  
+    document.getElementById('orderId').innerText = orderId;
     cleanCartAndSetOrder();
 }
 
 //-----------------------debut script -----------------------------
-showOrderId();
+confirmOrder();

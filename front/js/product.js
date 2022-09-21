@@ -10,14 +10,10 @@ function getProduct() {
 
         return;
     }
-    let request = new XMLHttpRequest();
-
-    request.open('GET', 'http://localhost:3000/api/products/' + id, false);
-    request.send(null);
-
-    if (request.status == 200) {
-        return showProductDetails(JSON.parse(request.responseText));
-    }    
+    
+    fetch('http://localhost:3000/api/products/' + id)
+    .then(response => response.json())
+    .then(response => showProductDetails(response));
 }
 
 // récuperer l'id du produit de l'url
